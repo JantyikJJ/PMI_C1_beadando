@@ -1,7 +1,6 @@
-#Health records
-##The Best health data manager
-###Beadandó projektmunka
+# Health records - The Best health data manager
+Beadandó projektmunka
 
 
-#Dokumentáció
+# Dokumentáció
 [TBD]
