@@ -15,8 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
 /*
     The names are from https://homepage.net/name_generator/
     The random city names are from https://www.name-generator.org.uk/?i=ovzz1ig
-
-    The rest of code is done by János Jantyik.
  */
 public class RecordsGenerator {
 
@@ -52,15 +50,18 @@ public class RecordsGenerator {
                 "West Memphis (US)", "Taree (AU)", "Woodstock (CA)", "Oak Ridge (US)",
                 "Armidale (AU)", "Helmsley (UK)", "Channel-Port aux Basques (CA)" };
 
+        // get static objects from other classes for ease of access
         Random rng = Main.getRandom();
         List<Record> records = Records.getRecords();
 
+        // define bounds for random birthday
         LocalDate birthdayStart = LocalDate.of(1960, 1, 1);
         LocalDate birthdayEnd = LocalDate.now();
 
         for (int i = 0; i < count; i++) {
             String firstName;
             Gender gender = Gender.Female;
+            // generate random gender and generate names based on that
             if (rng.nextInt(10) > 4) {
                 firstName = maleNames[rng.nextInt(maleNames.length)];
                 gender = Gender.Male;
@@ -68,9 +69,20 @@ public class RecordsGenerator {
             else {
                 firstName = femaleNames[rng.nextInt(femaleNames.length)];
             }
+            // generate random birthday between bounds
             Birth birth = new Birth(cities[rng.nextInt(cities.length)],
                     LocalDate.ofEpochDay(rng.nextLong(birthdayStart.toEpochDay(), birthdayEnd.toEpochDay())));
 
+            // generate random blood pressure
+            // 81-90 - low diastolic and high systolic
+            // 71-80 - high diastolic and low systolic
+            // 61-70 - low diastolic and systolic
+            // 51-60 - high diastolic and systolic
+            // 41-50 - low systolic
+            // 31-40 - low diastolic
+            // 21-30 - high systolic
+            // 11-20 - high diastolic
+            // 00-10 - normal
             List<BloodPressure> bloodPressureList = new ArrayList<>();
             int bpRandom = rng.nextInt(90);
             if (bpRandom > 80) {
@@ -110,6 +122,7 @@ public class RecordsGenerator {
             }
             EnumSet<BloodPressure> bloodPressures = EnumSet.copyOf(bloodPressureList);
 
+            // generate random cholesterol 0-10: normal, 11-20: low, 21-30: high
             Cholesterol cholesterol = Cholesterol.Normal;
             int cRandom = rng.nextInt(30);
             if (cRandom > 20) {
@@ -119,11 +132,13 @@ public class RecordsGenerator {
                 cholesterol = Cholesterol.Low;
             }
 
+            // generate random smoker and weight between 45 and 120, then put into database
             records.add(new Record(firstName, lastNames[rng.nextInt(lastNames.length)], birth, gender, bloodPressures,
                     cholesterol, rng.nextBoolean(), rng.nextDouble(45, 120)));
         }
 
         if (save) {
+            // saving to XML file
             try {
                 Records.save();
             }

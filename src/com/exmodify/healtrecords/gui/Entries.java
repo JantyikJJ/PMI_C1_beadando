@@ -6,15 +6,16 @@ import com.exmodify.healtrecords.database.RecordsGenerator;
 import com.exmodify.healtrecords.database.models.Record;
 import com.exmodify.healtrecords.database.models.events.ProgressChangeListener;
 import com.exmodify.healtrecords.gui.components.RecordsTableModel;
+import com.exmodify.healtrecords.gui.dialogs.Edit;
 import com.exmodify.healtrecords.main.Main;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,57 +23,36 @@ public class Entries extends BaseGUI {
     private JPanel mainPanel;
     private JTable entries;
     private JMenuBar menuBar;
-    private final List<ProgressChangeListener> listeners;
+
+    private JMenuItem editItem;
+    private JMenuItem deleteItem;
 
     public Entries() {
-        listeners = new ArrayList<>();
+
     }
 
-    public void addProgressListener(ProgressChangeListener l) {
-        listeners.add(l);
-    }
-
+    /**
+     * Builds the menu bar, then creates the table model for the Record entries.
+     */
     public void processEntries() {
         buildMenu();
 
-
-        List<Record> records = Records.getRecords();
         RecordsTableModel model = new RecordsTableModel();
         entries.setModel(model);
         entries.setAutoCreateColumnsFromModel(true);
-
-
-        int c = records.size();
-        if (c == 0) {
-            for (ProgressChangeListener listener : listeners) {
-                listener.update(0, 0);
-            }
-        }
-        else {
-            for (int i = 0; i < c; i++) {
-                for (ProgressChangeListener listener : listeners) {
-                    listener.update(i + 1, c);
-                }
-            }
-        }
     }
-
+    /**
+     * Building the menu bar, menus and menu items
+     * Attaching appropriate listeners to them
+     */
     private void buildMenu() {
         /*  -----------
             FILE
             ----------- */
         JMenu menu = new JMenu("File");
 
-        JMenuItem item = new JMenuItem(new AbstractAction("Edit selected") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Edit
-            }
-        });
-        item.setEnabled(false);
-        menu.add(item);
-
-        item = new JMenuItem(new AbstractAction("Tips") {
+        // File -> Tips: Shows Tips dialogue
+        JMenuItem item = new JMenuItem(new AbstractAction("Tips") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showTips();
@@ -80,6 +60,7 @@ public class Entries extends BaseGUI {
         });
         menu.add(item);
 
+        // File -> Save: Saves all
         item = new JMenuItem(new AbstractAction("Save") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,10 +70,15 @@ public class Entries extends BaseGUI {
                 catch (Exception ignored) { }
             }
         });
+        // Setting CTRL + S as shortcut for Save
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
         menu.add(item);
+
+        // File -> Clear all data: deletes all data from Records database
         item = new JMenuItem(new AbstractAction("Clear all data") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Asking the user if they really want to remove all entries for extra security
                 int result = JOptionPane.showConfirmDialog(frame, """
                                 Are you sure you want to remove all data?
                                 
@@ -100,11 +86,20 @@ public class Entries extends BaseGUI {
                         "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
                 if (result == JOptionPane.OK_OPTION) {
+                    // clearing the list
                     Records.getRecords().clear();
-                    try {
-                        Records.save();
+
+                    // auto saving to file or letting the user save whenever they want
+                    // based on configuration
+                    if (Config.autoSave) {
+                        try {
+                            Records.save();
+                        }
+                        catch (Exception ignored) { }
                     }
-                    catch (Exception ignored) { }
+                    else {
+                        Main.setPendingChanges(true);
+                    }
 
                     repaintTable();
                 }
@@ -112,9 +107,12 @@ public class Entries extends BaseGUI {
         });
         menu.add(item);
 
+        // File -> Generate test data
         item = new JMenuItem(new AbstractAction("Generate test data") {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Getting data between 1 - unlimited
+                // 0 or closing -> cancel generation
                 int input = 0;
                 do {
                     if (input == -1) {
@@ -127,9 +125,8 @@ public class Entries extends BaseGUI {
                 }
                 while (input == -1);
 
-                System.out.println(input);
-
                 if (input > 0) {
+                    // valid input, bigger than 0 -> generate
                     RecordsGenerator.generate(input, true);
                     repaintTable();
                 }
@@ -137,9 +134,13 @@ public class Entries extends BaseGUI {
         });
         menu.add(item);
 
-        item = new JMenuItem("Settings");
-        item.addActionListener((e) -> {
-            // Open settings panel
+        // File -> Exit
+        item = new JMenuItem(new AbstractAction("Exit") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // simply set visibility to false -> trigger window on close event
+                frame.setVisible(false);
+            }
         });
         menu.add(item);
 
@@ -150,11 +151,17 @@ public class Entries extends BaseGUI {
             ----------- */
         menu = new JMenu("Quick options");
 
-        JCheckBoxMenuItem checkboxItem = new JCheckBoxMenuItem("Auto save after change");
+        // creating checkbox item
+        JCheckBoxMenuItem checkboxItem = new JCheckBoxMenuItem("Auto save after row edit");
+        // setting the default value from the configuration
         checkboxItem.setState(Config.autoSave);
+        // attacking change listener
         checkboxItem.addActionListener((e) -> {
+            // getting the source, then the value
             AbstractButton ab = (AbstractButton)e.getSource();
             Config.autoSave = ab.getModel().isSelected();
+
+            // saving config to file
             try {
                 Config.save();
             }
@@ -162,6 +169,7 @@ public class Entries extends BaseGUI {
         });
         menu.add(checkboxItem);
 
+        // Same structure as auto save
         checkboxItem = new JCheckBoxMenuItem("Show tips on startup");
         checkboxItem.setState(Config.showTips);
         checkboxItem.addActionListener((e) -> {
@@ -174,20 +182,151 @@ public class Entries extends BaseGUI {
         });
         menu.add(checkboxItem);
 
+        // Same structure as auto save
+        checkboxItem = new JCheckBoxMenuItem("Reverse naming order");
+        checkboxItem.setState(Config.reverseNaming);
+        checkboxItem.addActionListener((e) -> {
+            AbstractButton ab = (AbstractButton)e.getSource();
+            Config.reverseNaming = ab.getModel().isSelected();
+            try {
+                Config.save();
+            }
+            catch (Exception ignored) { }
+            // repainting table after naming order change
+            repaintTable();
+        });
+        menu.add(checkboxItem);
+
         menuBar.add(menu);
+
+        // Adding plain menu item to menu bar instead of into a menu for ease of access
+        item = new JMenuItem(new AbstractAction("Add") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Edit dialogue can be used without reference record to create a new record
+                Edit add = new Edit();
+                add.show(null);
+            }
+        });
+        menuBar.add(item);
+
+        // same logic as "Add" menu item
+        item = new JMenuItem(new AbstractAction("Edit") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Edit edit = new Edit();
+                edit.show(Records.getRecords().get(entries.getSelectedRow()));
+            }
+        });
+        // saving "Edit" menu item as global property for enabling - disabling based on row selection
+        editItem = item;
+        item.setEnabled(false);
+        menuBar.add(item);
+
+        // same logic as "Edit"
+        item = new JMenuItem(new AbstractAction("Delete") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = entries.getSelectedRow();
+                Records.getRecords().remove(entries.getSelectedRow());
+                if (Config.autoSave) {
+                    try {
+                        Records.save();
+                    }
+                    catch (Exception ignored) { }
+                }
+                else {
+                    Main.setPendingChanges(true);
+                }
+                repaintTable();
+
+                SwingUtilities.invokeLater(() -> {
+                    if (entries.getRowCount() != 0) {
+                        int newIndex = index;
+                        if (newIndex == entries.getRowCount()) {
+                            newIndex--;
+                        }
+                        entries.setRowSelectionInterval(newIndex, newIndex);
+                    }
+                });
+            }
+        });
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        deleteItem = item;
+        item.setEnabled(false);
+        menuBar.add(item);
+
+        // if row selected -> allow row delete / edit
+        // if not -> disable row delete / edit
+        entries.getSelectionModel().addListSelectionListener(e -> {
+            if (entries.getSelectedRow() > -1) {
+                editItem.setEnabled(true);
+                deleteItem.setEnabled(true);
+            }
+            else {
+                editItem.setEnabled(false);
+                deleteItem.setEnabled(false);
+            }
+
+        });
+
+        // double click event listener for row edit
+        entries.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent mouseEvent) {
+                // if double click AND there's a row selected
+                if (mouseEvent.getClickCount() == 2 && entries.getSelectedRow() != -1) {
+                    Edit edit = new Edit();
+                    edit.show(Records.getRecords().get(entries.getSelectedRow()));
+                }
+            }
+        });
     }
 
+    /**
+     * Initializes the main frame for the GUI.
+     * It also sets the GUI to the center of the screen
+     *
+     */
     @Override
     protected void initFrame() {
         frame = new JFrame("Health Records");
         frame.setContentPane(mainPanel);
-
+        // center frame
         centerPosition(mainPanel.getPreferredSize());
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // if there's unsaved changes
+                if (Main.isPendingChanges()) {
+                    // show a question dialogue if the user would like to save changes
+                    int result = JOptionPane.showConfirmDialog(frame, """
+                                    You have pending changes in the records!
+                                    
+                                    Would you like to save before quitting?""", "Question",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    // if yes -> save
+                    if (result == JOptionPane.YES_OPTION) {
+                        try {
+                            Records.save();
+                        }
+                        catch (Exception ignored) { }
+                    }
+                }
+                // close frame and exit
+                frame.setVisible(false);
+                System.exit(0);
+                super.windowClosing(e);
+            }
+        });
+        // don't do anything on close -> trigger
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.pack();
     }
 
+    /**
+     * Shows the main form, and the Tips dialogue if showing tips on startup is enabled.
+     */
     @Override
     public void show() {
         super.show();
@@ -197,6 +336,10 @@ public class Entries extends BaseGUI {
         }
     }
 
+    /**
+     * Shows the Tips dialogue for quick tips!
+     * It's on a different thread so the dialogue isn't waited to be closed
+     */
     private void showTips() {
         Thread th = new Thread(() -> {
             Main.getTips().show();
@@ -224,7 +367,11 @@ public class Entries extends BaseGUI {
             return -1;
         }
     }
-    private void repaintTable() {
+
+    /**
+     * Repaints the table, used after the Records database have been modified.
+     */
+    public void repaintTable() {
         ((AbstractTableModel) entries.getModel()).fireTableChanged(new TableModelEvent(entries.getModel()));
     }
 }

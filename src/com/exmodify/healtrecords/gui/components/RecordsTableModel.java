@@ -12,25 +12,46 @@ import java.util.Date;
 import java.util.List;
 
 public class RecordsTableModel extends AbstractTableModel {
-    String[] columns = { "Name", "Birth", "Age", "Gender", "Cholesterol", "Blood pressure", "Smoker", "Weight" };
+    // define column values
+    final String[] columns = { "Name", "Birth", "Age", "Gender", "Cholesterol", "Blood pressure", "Smoker", "Weight" };
+    // save records for ease of access (it's only reference anyway)
     List<Record> records;
 
+    /**
+     * The JTable Data model for Records
+     */
     public RecordsTableModel() {
         records = Records.getRecords();
     }
 
+    /**
+     * Data length
+     * @return how many data are present in the Records list
+     */
     @Override
     public int getRowCount() {
         return records.size();
     }
+
+    /**
+     * Column length
+     * @return REturn how many columns are defined (String[] columns constant)
+     */
     @Override
     public int getColumnCount() {
         return columns.length;
     }
 
+    /**
+     * Gets value for a specific row and column
+     * @param rowIndex the index of the row (Record itself)
+     * @param columnIndex the index of the column (which property { "Name", "Birth", "Age",
+     *                    "Gender", "Cholesterol", "Blood pressure", "Smoker", "Weight" })
+     * @return the value of columnIndex-th property of the rowIndex-th Record
+     */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        // { "Name", "Birth", "Age", "Gender", "Cholesterol", "Blood pressure", "Smoker", "Weight" };
+        // get record at row
         Record record = records.get(rowIndex);
         switch (columnIndex) {
             case 0: // Name
@@ -59,9 +80,20 @@ public class RecordsTableModel extends AbstractTableModel {
         return null;
     }
 
+    /**
+     * Get name of the column
+     * @param columnIndex the index of the column
+     * @return the column name under columnIndex
+     */
     public String getColumnName(int columnIndex) {
         return columns[columnIndex];
     }
+
+    /**
+     * Return the class type of the property under the specific column
+     * @param columnIndex the column index
+     * @return the Class of the type of object
+     */
     public Class getColumnClass(int columnIndex) {
         if (columnIndex == 2) return Integer.class;
         if (columnIndex == 7) return Double.class;
