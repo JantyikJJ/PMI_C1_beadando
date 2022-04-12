@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 
 public class Config {
     public static boolean showTips = true;
+    public static boolean reverseNaming = true;
+    public static boolean autoSave = true;
 
     public static void load() throws IOException, IllegalAccessException {
         if (!new File("settings.ini").exists()) {
@@ -23,7 +25,7 @@ public class Config {
 
             for (Field field : cfgFields) {
                 if (field.getName().toLowerCase().equals(data[0])) {
-                    if (field.getType().getName().equals("Boolean")) {
+                    if (field.getType().getName().equalsIgnoreCase("boolean")) {
                         field.setBoolean(null, Boolean.parseBoolean(data[1]));
                     }
                 }

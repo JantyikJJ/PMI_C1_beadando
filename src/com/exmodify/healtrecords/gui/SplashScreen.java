@@ -4,6 +4,8 @@ import com.exmodify.healtrecords.database.Config;
 import com.exmodify.healtrecords.database.Records;
 import com.exmodify.healtrecords.database.models.events.ProgressChangeListener;
 import com.exmodify.healtrecords.gui.components.JImagePanel;
+import com.exmodify.healtrecords.gui.dialogs.Tips;
+import com.exmodify.healtrecords.main.Main;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
@@ -64,14 +66,17 @@ public class SplashScreen extends BaseGUI {
         progressBar = new JProgressBar();
         progressLabel = new JLabel("Loading...", SwingConstants.LEFT);
 
-        progressBar.setBounds(0, splashHeight - 25, splashWidth - 150, 25);
+        int height = 25;
+        int labelWidth = 200;
+
+        progressBar.setBounds(0, splashHeight - height, splashWidth - labelWidth, height);
         progressBar.setStringPainted(true);
         progressBar.setMaximum(100);
         progressBar.setMinimum(0);
         progressBar.setBorderPainted(false);
         progressBar.setBackground(new Color(8, 0, 84));
 
-        progressLabel.setBounds(splashWidth - 150, splashHeight - 25, 150, 25);
+        progressLabel.setBounds(splashWidth - labelWidth, splashHeight - height, labelWidth, height);
         progressLabel.setForeground(Color.white);
     }
 
@@ -82,12 +87,9 @@ public class SplashScreen extends BaseGUI {
         mainPanel.add(progressLabel);
 
         frame = new JFrame("Splash");
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension preferredSize = mainPanel.getPreferredSize();
 
-        int x = (dim.width - preferredSize.width) / 2;
-        int y = (dim.height - preferredSize.height) / 2;
-        frame.setLocation(x, y);
+        centerPosition(mainPanel.getPreferredSize());
+
         frame.setUndecorated(true);
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +117,7 @@ public class SplashScreen extends BaseGUI {
                     });
                     current++;
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(5);
                     }
                     catch (Exception e) { e.printStackTrace(); }
                 }
@@ -158,6 +160,28 @@ public class SplashScreen extends BaseGUI {
         th.start();
     }
     private void prepareMain() {
+        Entries entries = Main.getEntries();
+        int next = 5;
+        entries.addProgressListener((processed, max) -> {
+            if (max != 0) {
+                progressBar.setValue((int)(95 + next * (processed / (double)max)));
 
+                if (processed == max) {
+                    progressLabel.setText("Done!");
+
+                    frame.setVisible(false);
+                    entries.show();
+                }
+            }
+            else {
+                progressBar.setValue(95 + next);
+                progressLabel.setText("Done!");
+
+                frame.setVisible(false);
+                entries.show();
+            }
+        });
+        Thread th = new Thread(entries::processEntries);
+        th.start();
     }
 }

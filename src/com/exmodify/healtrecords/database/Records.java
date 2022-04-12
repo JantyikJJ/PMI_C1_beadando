@@ -25,17 +25,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Records {
-    private static List<ProgressChangeListener> progressChanges;
-    private static List<Record> records;
+    private static final List<ProgressChangeListener> progressChanges = new ArrayList<>();
+    private static final List<Record> records = new ArrayList<>();
+
+    public static List<Record> getRecords() {
+        return records;
+    }
+    public static boolean updateRecord(Record oldRecord, Record newRecord) {
+        for (int i = 0; i < records.size(); i++){
+            if (records.get(i) == oldRecord) {
+                records.set(i, newRecord);
+                try {
+                    save();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static void addEventListener(ProgressChangeListener listener) {
-        if (progressChanges == null) progressChanges = new ArrayList<>();
         progressChanges.add(listener);
     }
 
     public static void load() throws IOException, org.xml.sax.SAXException, ParserConfigurationException {
-        records = new ArrayList<>();
-
         if (new File("records.xml").exists()) {
             FileInputStream fis = new FileInputStream("records.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -58,9 +75,9 @@ public class Records {
                 String bloodPressure = element.getElementsByTagName("bloodPressure").item(0).getTextContent();
                 String cholesterol = element.getElementsByTagName("cholesterol").item(0).getTextContent();
 
-                boolean smoker = element.getElementsByTagName("cholesterol").item(0)
+                boolean smoker = element.getElementsByTagName("smoker").item(0)
                         .getTextContent().equals("true");
-                double weight = Double.parseDouble(element.getElementsByTagName("cholesterol").item(0)
+                double weight = Double.parseDouble(element.getElementsByTagName("weight").item(0)
                         .getTextContent());
 
                 records.add(new Record(firstName, lastName, birth, gender, bloodPressure, cholesterol, smoker, weight));
@@ -93,7 +110,6 @@ public class Records {
             }
         }
     }
-
     public static void save() throws IOException, ParserConfigurationException, TransformerException {
         FileWriter fw = new FileWriter("records.xml");
         fw.flush();

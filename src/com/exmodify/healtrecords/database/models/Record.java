@@ -4,13 +4,17 @@ import com.exmodify.healtrecords.database.Records;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 public class Record {
     private String firstName;
     private String lastName;
 
     private Birth birth;
     private Gender gender;
-    private BloodPressure bloodPressure;
+    private EnumSet<BloodPressure> bloodPressure;
     private Cholesterol cholesterol;
 
     private boolean smoker;
@@ -24,6 +28,17 @@ public class Record {
         setGender(gender);
         setBloodPressure(bloodPressure);
         setCholesterol(cholesterol);
+        this.smoker = smoker;
+        this.weight = weight;
+    }
+    public Record(String firstName, String lastName, Birth birth, Gender gender, EnumSet<BloodPressure> bloodPressure,
+                  Cholesterol cholesterol, boolean smoker, double weight) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birth = birth;
+        this.gender = gender;
+        this.bloodPressure = bloodPressure;
+        this.cholesterol = cholesterol;
         this.smoker = smoker;
         this.weight = weight;
     }
@@ -59,14 +74,50 @@ public class Record {
         this.gender = Gender.valueOf(gender);
     }
 
-    public BloodPressure getBloodPressure() {
+    public EnumSet<BloodPressure> getBloodPressure() {
         return bloodPressure;
     }
-    public void setBloodPressure(BloodPressure bloodPressure) {
+    public void setBloodPressure(EnumSet<BloodPressure> bloodPressure) {
         this.bloodPressure = bloodPressure;
     }
     public void setBloodPressure(String bloodPressure) {
-        this.bloodPressure = BloodPressure.valueOf(bloodPressure);
+        String[] flagValues = bloodPressure.split(",");
+        List<BloodPressure> flags = new ArrayList<>();
+        for (String value : flagValues) {
+            flags.add(BloodPressure.valueOf(value));
+        }
+        EnumSet<BloodPressure> set = EnumSet.copyOf(flags);
+        setBloodPressure(set);
+    }
+    public String getBloodPressureAsDisplayString() {
+        List<String> parts = new ArrayList<>();
+
+        if (bloodPressure.contains(BloodPressure.Normal)) {
+            return "Normal";
+        }
+        if (bloodPressure.contains(BloodPressure.HighDiastolic) && bloodPressure.contains(BloodPressure.HighSystolic)) {
+            return "High";
+        }
+        if (bloodPressure.contains(BloodPressure.LowDiastolic) && bloodPressure.contains(BloodPressure.LowSystolic)) {
+            return "Low";
+        }
+
+        if (bloodPressure.contains(BloodPressure.HighDiastolic)) {
+            parts.add("High diastolic");
+        }
+        if (bloodPressure.contains(BloodPressure.HighSystolic)) {
+            parts.add("High systolic");
+        }
+
+        if (bloodPressure.contains(BloodPressure.LowDiastolic)) {
+            parts.add("Low diastolic");
+        }
+        if (bloodPressure.contains(BloodPressure.LowSystolic)) {
+            parts.add("Low systolic");
+        }
+
+
+        return String.join(", ", parts);
     }
 
     public Cholesterol getCholesterol() {
@@ -101,7 +152,12 @@ public class Record {
         Records.appendElement("lastName", this.lastName, document, record);
         record.appendChild(birth.toElement(document));
         Records.appendElement("gender", this.gender, document, record);
-        Records.appendElement("bloodPressure", this.bloodPressure, document, record);
+        List<String> bp = new ArrayList<>();
+        for (BloodPressure pressure : this.bloodPressure) {
+            bp.add(pressure.toString());
+        }
+
+        Records.appendElement("bloodPressure", String.join(",", bp), document, record);
         Records.appendElement("cholesterol", this.cholesterol, document, record);
         Records.appendElement("smoker", this.smoker, document, record);
         Records.appendElement("weight", this.weight, document, record);

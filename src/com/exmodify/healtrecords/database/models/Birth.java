@@ -4,6 +4,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.chrono.ChronoLocalDate;
+import java.util.Calendar;
+import java.util.Date;
+
 public class Birth {
 
     private String birthPlace;
@@ -16,6 +22,13 @@ public class Birth {
         this.birthYear = birthYear;
         this.birthMonth = birthMonth;
         this.birthDay = birthDay;
+    }
+
+    public Birth(String birthPlace, LocalDate date) {
+        this.birthPlace = birthPlace;
+        this.birthYear = (short)date.getYear();
+        this.birthMonth = (byte)date.getMonthValue();
+        this.birthDay = (byte)date.getDayOfMonth();
     }
 
     public static Birth fromNode(Element parent) {
@@ -78,5 +91,10 @@ public class Birth {
     }
     public void setBirthDay(byte birthDay) {
         this.birthDay = birthDay;
+    }
+
+    @Override
+    public String toString() {
+        return birthPlace + ", " + birthYear + "/" + birthMonth + "/" + birthDay;
     }
 }
