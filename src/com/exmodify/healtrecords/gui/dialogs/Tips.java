@@ -46,10 +46,6 @@ public class Tips extends BaseGUI {
 
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
     private void nextClicked(ActionEvent e) {
         currentTip++;
         if (currentTip == tips.length) {

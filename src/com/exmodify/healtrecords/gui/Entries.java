@@ -204,10 +204,6 @@ public class Entries extends BaseGUI {
         th.start();
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
     /**
      * Parses the String into an Integer with some additional validation
      *
