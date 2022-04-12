@@ -1,6 +1,6 @@
 # Health records - The Best health data manager
-Beadandó projektmunka
+Project work
 
 
-# Dokumentáció
-[TBD]
+# Documentation
+[JavaDoc documentation](https://healthrecordsdoc.exmodify.com/)
