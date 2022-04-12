@@ -3,9 +3,25 @@ package com.exmodify.healtrecords.gui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Base class so all GUIs have JFrames in them which can be toggled
+ */
 public abstract class BaseGUI {
+    /**
+     * The main JFrame of the GUI
+     */
     protected JFrame frame;
 
+    /**
+     * Nothing is initialized in the base GUI consturctor.
+     */
+    public BaseGUI() {
+
+    }
+
+    /**
+     * Initialized the JFrame (frame)
+     */
     protected abstract void initFrame();
 
     /**

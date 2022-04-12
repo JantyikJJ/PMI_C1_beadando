@@ -5,18 +5,27 @@ import com.exmodify.healtrecords.database.models.Record;
 import com.exmodify.healtrecords.main.Main;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
-/*
-    The names are from https://homepage.net/name_generator/
-    The random city names are from https://www.name-generator.org.uk/?i=ovzz1ig
+
+/**
+ * Generate random data into the Records list<br><br>
+ * The names are from <a href="https://homepage.net/name_generator/">HomePage name generator</a><br>
+ * The random city names are from <a href="https://www.name-generator.org.uk/?i=ovzz1ig">Masterpiece name generator</a>
+ * <br>
  */
 public class RecordsGenerator {
+    /**
+     * RecordsGenerator constructor.
+     *
+     * @deprecated This class only has static methods, thus instancing is unnecessary.
+     */
+    public RecordsGenerator() {
+
+    }
 
     /**
      * Generates n random records

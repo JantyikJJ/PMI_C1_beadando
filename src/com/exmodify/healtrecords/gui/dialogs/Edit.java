@@ -10,22 +10,70 @@ import com.exmodify.healtrecords.database.models.Birth;
 import com.exmodify.healtrecords.database.models.Record;
 import com.exmodify.healtrecords.main.Main;
 
+/**
+ * The Edit / Add GUI
+ */
 public class Edit extends JDialog {
+    /**
+     * The main panel containing all the elements
+     */
     private JPanel mainPanel;
+    /**
+     * The OK Button
+     */
     private JButton buttonOK;
+    /**
+     * The cancel button
+     */
     private JButton buttonCancel;
+    /**
+     * First name input
+     */
     private JTextField firstName;
+    /**
+     * Last name input
+     */
     private JTextField lastName;
+    /**
+     * Birthplace input
+     */
     private JTextField birthPlace;
+    /**
+     * Birth year input
+     */
     private JTextField birthYear;
+    /**
+     * Birth month input
+     */
     private JTextField birthMonth;
+    /**
+     * Day of birth input
+     */
     private JTextField birthDay;
-    private JComboBox gender;
+    /**
+     * Gender input
+     */
+    private JComboBox<String> gender;
+    /**
+     * Weight input
+     */
     private JTextField weight;
+    /**
+     * Smoker input
+     */
     private JCheckBox smoker;
-    private JComboBox bloodPressure;
-    private JComboBox cholesterol;
+    /**
+     * Blood pressure input
+     */
+    private JComboBox<String> bloodPressure;
+    /**
+     * Cholesterol input
+     */
+    private JComboBox<String> cholesterol;
 
+    /**
+     * The current Record to be edited. If null -> create new record and add it to list
+     */
     private Record currentRecord;
 
     /**
@@ -62,7 +110,8 @@ public class Edit extends JDialog {
      */
     private void onOK(ActionEvent e) {
         // if fields aren't valid -> notify user then close without saving
-        if (!validateFields()) {
+        if (!validateFields() || gender.getSelectedItem() == null || bloodPressure.getSelectedItem() == null
+                || cholesterol.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(this, "Incorrect data, input won't be saved.");
             dispose();
             return;
@@ -174,6 +223,11 @@ public class Edit extends JDialog {
                 && validateDate()
                 && validateDoubleField(weight);
     }
+
+    /**
+     * Validated the birthdate variables
+     * @return true if birthdate is valid, false if it's invalid
+     */
     private boolean validateDate() {
         // check if fields are valid numbers and they're supposedly in range
         if (validateIntegerField(birthYear, 0, LocalDate.now().getYear())

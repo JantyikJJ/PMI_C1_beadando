@@ -16,9 +16,21 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Splash loading screen and actual data loading initiator.
+ */
 public class SplashScreen extends BaseGUI {
+    /**
+     * Main panel containing all the components.
+     */
     private final JImagePanel mainPanel;
+    /**
+     * Progress bar showing the current total loading progress
+     */
     private final JProgressBar progressBar;
+    /**
+     * Progress label showing at what stage is the loading at.
+     */
     private final JLabel progressLabel;
 
     /**
@@ -121,6 +133,9 @@ public class SplashScreen extends BaseGUI {
         SwingUtilities.invokeLater(this::load);
     }
 
+    /**
+     * Starts loading the configuration and the Records
+     */
     public void load() {
         try {
             progressLabel.setText("Loading config...");
@@ -152,6 +167,10 @@ public class SplashScreen extends BaseGUI {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Starts loading the Records from XML
+     */
     private void loadRecords() {
         progressLabel.setText("Loading records...");
         int next = 95;
@@ -187,6 +206,10 @@ public class SplashScreen extends BaseGUI {
         });
         th.start();
     }
+
+    /**
+     * Start building and shows the Entries GUI.
+     */
     private void prepareMain() {
         Thread th = new Thread(() -> {
             Entries entries = Main.getEntries();

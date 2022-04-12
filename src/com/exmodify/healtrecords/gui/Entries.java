@@ -3,30 +3,44 @@ package com.exmodify.healtrecords.gui;
 import com.exmodify.healtrecords.database.Config;
 import com.exmodify.healtrecords.database.Records;
 import com.exmodify.healtrecords.database.RecordsGenerator;
-import com.exmodify.healtrecords.database.models.Record;
-import com.exmodify.healtrecords.database.models.events.ProgressChangeListener;
 import com.exmodify.healtrecords.gui.components.RecordsTableModel;
 import com.exmodify.healtrecords.gui.dialogs.Edit;
 import com.exmodify.healtrecords.main.Main;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
-import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Main GUI of Health Records application.
+ */
 public class Entries extends BaseGUI {
+    /**
+     * Main panel containing all the components
+     */
     private JPanel mainPanel;
+    /**
+     * Entries table containing all the Records
+     */
     private JTable entries;
+    /**
+     * Menu bar
+     */
     private JMenuBar menuBar;
 
+    /**
+     * Edit menu item which can be enabled - disabled based on row selection
+     */
     private JMenuItem editItem;
+    /**
+     * Delete menu item which can be enabled - disabled based on row selection
+     */
     private JMenuItem deleteItem;
 
+    /**
+     * Default constructor of Entries GUI
+     */
     public Entries() {
 
     }
@@ -127,7 +141,11 @@ public class Entries extends BaseGUI {
 
                 if (input > 0) {
                     // valid input, bigger than 0 -> generate
-                    RecordsGenerator.generate(input, true);
+                    RecordsGenerator.generate(input, Config.autoSave);
+                    // if it wasn't saved, save that there are pending changes
+                    if (!Config.autoSave) {
+                        Main.setPendingChanges(true);
+                    }
                     repaintTable();
                 }
             }
@@ -341,9 +359,7 @@ public class Entries extends BaseGUI {
      * It's on a different thread so the dialogue isn't waited to be closed
      */
     private void showTips() {
-        Thread th = new Thread(() -> {
-            Main.getTips().show();
-        });
+        Thread th = new Thread(() -> Main.getTips().show());
         th.start();
     }
 

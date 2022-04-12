@@ -8,16 +8,43 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * Record class holding every piece of information altogether
+ */
 public class Record {
+    /**
+     * First name of the person
+     */
     private String firstName;
+    /**
+     * Last name of the person
+     */
     private String lastName;
 
-    private Birth birth;
+    /**
+     * Birth information of the person
+     */
+    private final Birth birth;
+    /**
+     * Gender of the person
+     */
     private Gender gender;
+    /**
+     * Blood pressure information about the person
+     */
     private EnumSet<BloodPressure> bloodPressure;
+    /**
+     * Cholesterol level of the person
+     */
     private Cholesterol cholesterol;
 
+    /**
+     * Stores whether the person is smoking. True if they are, false if they aren't.
+     */
     private boolean smoker;
+    /**
+     * Weight of the person
+     */
     private double weight;
 
     /**

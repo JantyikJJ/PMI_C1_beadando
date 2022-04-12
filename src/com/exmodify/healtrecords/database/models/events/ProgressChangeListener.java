@@ -1,5 +1,9 @@
 package com.exmodify.healtrecords.database.models.events;
 
+/**
+ * Progress change event listener
+ * The {@link #update(int, int)} function is invoked every time the there's new progress in the given process.
+ */
 public interface ProgressChangeListener {
     /**
      * This is invoked when the specific process has progressed

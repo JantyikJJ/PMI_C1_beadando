@@ -3,8 +3,14 @@ package com.exmodify.healtrecords.gui.components;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * JPanel with image support
+ */
 public class JImagePanel extends JPanel {
 
+    /**
+     * Background image of the JPanel
+     */
     private transient Icon icon;
 
     /**

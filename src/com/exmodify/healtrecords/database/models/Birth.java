@@ -6,11 +6,26 @@ import org.w3c.dom.Element;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Birth object containing all the birth-related data for a Record
+ */
 public class Birth {
 
+    /**
+     * Place of birth
+     */
     private String birthPlace;
+    /**
+     * Year of birth
+     */
     private Short birthYear;
+    /**
+     * Month of birth
+     */
     private byte birthMonth;
+    /**
+     * Day of birth
+     */
     private byte birthDay;
 
     /**

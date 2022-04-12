@@ -3,9 +3,21 @@ package com.exmodify.healtrecords.database;
 import java.io.*;
 import java.lang.reflect.Field;
 
+/**
+ * The static configuration class
+ */
 public class Config {
+    /**
+     * Whether the Tips dialog should automatically open on application load
+     */
     public static boolean showTips = true;
+    /**
+     * Whether the first and last naming should be reversed (like in Hungary)
+     */
     public static boolean reverseNaming = true;
+    /**
+     * Whether the Records should be saved automatically after data edit
+     */
     public static boolean autoSave = true;
 
     /**
@@ -93,4 +105,11 @@ public class Config {
         // make first character uppercase and append the rest of the String to it
         return n.toUpperCase() + txt.substring(1);
     }
+
+    /**
+     * Config constructor.
+     *
+     * @deprecated This class has only static methods thus instancing is unnecessary.
+     */
+    public Config() { }
 }

@@ -2,19 +2,23 @@ package com.exmodify.healtrecords.gui.components;
 
 import com.exmodify.healtrecords.database.Config;
 import com.exmodify.healtrecords.database.Records;
-import com.exmodify.healtrecords.database.models.Cholesterol;
-import com.exmodify.healtrecords.database.models.Gender;
 import com.exmodify.healtrecords.database.models.Record;
 
 import javax.swing.table.AbstractTableModel;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
+/**
+ * Table model for Records List
+ */
 public class RecordsTableModel extends AbstractTableModel {
-    // define column values
+    /**
+     * Constant String array defining all the columns available
+     */
     final String[] columns = { "Name", "Birth", "Age", "Gender", "Cholesterol", "Blood pressure", "Smoker", "Weight" };
-    // save records for ease of access (it's only reference anyway)
+    /**
+     * Local instance of Records List for ease of access
+     */
     List<Record> records;
 
     /**
@@ -94,7 +98,7 @@ public class RecordsTableModel extends AbstractTableModel {
      * @param columnIndex the column index
      * @return the Class of the type of object
      */
-    public Class getColumnClass(int columnIndex) {
+    public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 2) return Integer.class;
         if (columnIndex == 7) return Double.class;
 

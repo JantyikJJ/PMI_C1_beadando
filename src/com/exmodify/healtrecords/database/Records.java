@@ -25,8 +25,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handler for the XML file for storing the values of each Record instance.
+ */
 public class Records {
+    /**
+     * The event listeners for the progress change
+     */
     private static final List<ProgressChangeListener> progressChanges = new ArrayList<>();
+    /**
+     * The list that stores all the Record isntances
+     */
     private static final List<Record> records = new ArrayList<>();
 
     /**
@@ -186,5 +195,14 @@ public class Records {
         element.appendChild(doc.createTextNode(value.toString()));
         // add new element to the parent
         parent.appendChild(element);
+    }
+
+    /**
+     * Records constructor.
+     *
+     * @deprecated this class only contains static fields and methods, thus instancing is unnecessary.
+     */
+    public Records() {
+
     }
 }

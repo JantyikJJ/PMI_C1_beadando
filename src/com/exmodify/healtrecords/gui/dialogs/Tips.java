@@ -7,17 +7,42 @@ import com.exmodify.healtrecords.main.Main;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+/**
+ * Quick Tips GUI
+ */
 public class Tips extends BaseGUI {
-
+    /**
+     * Constant String array
+     */
     final String[] tips;
+    /**
+     * The index of the currently shown tip
+     */
     int currentTip;
+    /**
+     * The main panel containing all the components
+     */
     private JPanel mainPanel;
+    /**
+     * The next tip button
+     */
     private JButton next;
+    /**
+     * The close Tips GUI button
+     */
     private JButton close;
+    /**
+     * The No more tips button
+     */
     private JButton noMoreTips;
+    /**
+     * The counter label showing the current / total tips
+     */
     private JLabel counter;
+    /**
+     * The current tip label
+     */
     private JLabel tip;
 
     /**
